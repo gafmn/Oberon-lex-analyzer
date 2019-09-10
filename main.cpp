@@ -12,7 +12,7 @@ enum ClassName {
     RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
     Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
     While, For,
-    IntDec, IntHex, Real,
+    IntDec, IntHex, IntExp, Real,
 };
 
 
@@ -98,9 +98,12 @@ private:
     Token parseNumber() {
         Token token;
         // Check correctness
-        int token_value = *src_iter - '0';
+        string token_value = "";    
+        token_value += *src_iter;
+
         while (*src_iter >= '0' && *src_iter <= '9') {
-            token_value = 10 * token_value + *src_iter++ - '0';
+            token_value += *src_iter;
+            src_iter++;
             if (*src_iter == 'H') {
                token.class_name = ClassName::IntHex;
                token.value = token_value + 'H';
@@ -113,14 +116,23 @@ private:
             }
             // Working with real numbers
             if (*src_iter == '.') {
-                double real_token_val = 0;
-                double result_value  = token_value;
-                while(*src_iter != ' ') {
-                   real_token_val = *src_iter/10 + *src_iter++ - '0'; 
+                while (*src_iter != ' ') {
+                    token_value += *src_iter;
+                    src_iter++;
                 }
-                result_value = result_value + real_token_val; 
                 token.class_name = ClassName::Real;
-                token.value = result_value;
+                token.value = token_value;
+                return token;
+            }
+            // Working with power of 10
+            if (*src_iter == 'E') {
+                while (*src_iter != ' ') {
+                    token_value += *src_iter;
+                    src_iter++;
+                }
+                token.class_name = ClassName::IntExp;
+                token.value = token_value;
+                return token;
             }
         }
         token.class_name = ClassName::IntDec;
