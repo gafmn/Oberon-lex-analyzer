@@ -2,24 +2,31 @@
 #include <string>
 
 using namespace std;
-string empty = "";
+
+
+enum ClassName {
+    Eof,  // Special type meaning the token is last in the source
+    Add, Sub, Mul, Divide,
+    Til, Apper, Dot, Comma, Semicolon, Pipe, LefBr, LefSqBr, LefFigBr,
+    Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, 
+    RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
+    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
+    While, For,
+    IntDec, IntHex, Real,
+};
+
 
 class Token {
 public:
-    string class_name;
+    ClassName class_name;
     string value;
 
 public:
-    enum ClassName{
-        Add, Sub, Mul, Divide,
-        Til, Apper, Dot, Comma, Semicolon, Pipe, LefBr, LefSqBr, LefFigBr,
-        Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, 
-        RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
-        Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
-        While, For,
-    };
+    Token() {
+        this->class_name = ClassName::Eof;
+    }
 
-    Token(string class_name, string value) {
+    Token(ClassName class_name, string value) {
         this->class_name = class_name;
         this->value = value;
     }
@@ -34,11 +41,11 @@ class Lexer {
 public:
     Lexer(string src) {
         this->src = src;
-        this->src_iter = src.begin();
+        this->src_iter = this->src.begin();
     }
 
     Token next() {
-        Token token = Token("", "");
+        Token token;
 
         while (src_iter != src.end()) {
             if (*src_iter == ' ' || *src_iter == '\n') {
@@ -89,18 +96,18 @@ private:
     }
 
     Token parseNumber() {
-        Token token = Token(empty, empty);
+        Token token;
         // Check correctness
         int token_value = *src_iter - '0';
         while (*src_iter >= '0' && *src_iter <= '9') {
             token_value = 10 * token_value + *src_iter++ - '0';
             if (*src_iter == 'H') {
-               token.class_name = "IntHex";
+               token.class_name = ClassName::IntHex;
                token.value = token_value + 'H';
                return token;
             }
             if (*src_iter >= 'A' && *src_iter <= 'F') {
-                token.class_name = "IntHex";
+                token.class_name = ClassName::IntHex;
                 token.value = token_value + *src_iter;
                 return token;
             }
@@ -112,17 +119,17 @@ private:
                    real_token_val = *src_iter/10 + *src_iter++ - '0'; 
                 }
                 result_value = result_value + real_token_val; 
-                token.class_name = "Real";
+                token.class_name = ClassName::Real;
                 token.value = result_value;
             }
         }
-        token.class_name = "IntDec";
+        token.class_name = ClassName::IntDec;
         token.value = token_value;
         return token;
     }
 
     Token parseIdentifier() {
-        Token token = Token(empty, empty);
+        Token token;
         return token;
     }
 };
@@ -132,11 +139,11 @@ int main() {
     string src = "";
 
     Lexer lexer = Lexer(src);
+    Token token = lexer.next();
 
-    Token token =  Token(nullptr, nullptr);
-    while (token.value != "") {
-        token = lexer.next();
+    while (token.class_name != ClassName::Eof) {
         cout << "Token " << token.value << endl;
+        token = lexer.next();
     }
 
     return 0;
