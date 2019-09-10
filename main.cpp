@@ -41,7 +41,15 @@ public:
         Token token = Token("", "");
 
         while (src_iter != src.end()) {
-            if (isDigit(*src_iter)) {
+            if (*src_iter == ' ' || *src_iter == '\n') {
+                // Skip spaces and new line characters
+            }
+            else if (*src_iter == '(') {
+                if (src_iter + 1 != src.end() && *(src_iter + 1) == '*') {
+                    parseComment();
+                }
+            }
+            else if (isDigit(*src_iter)) {
                 token = parseNumber();
             }
             else if (isLetter(*src_iter)) {
@@ -63,10 +71,27 @@ private:
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
+    void parseComment() {
+        if (src_iter + 2 == src.end()) {
+            cerr << "Comment section should be enclosed" << endl;
+            exit(1);
+        }
+
+        char last_char = ' ';
+        while (last_char != '*' && *src_iter != ')') {
+            src_iter++;
+
+            if (src_iter == src.end()) {
+                cerr << "Comment section should be enclosed" << endl;
+                exit(1);
+            }
+        }
+    }
+
     Token parseNumber() {
         Token token = Token(empty, empty);
         // Check correctness
-        int token_value = *src_iter - '0';    
+        int token_value = *src_iter - '0';
         while (*src_iter >= '0' && *src_iter <= '9') {
             token_value = 10 * token_value + *src_iter++ - '0';
             if (*src_iter == 'H') {
@@ -97,6 +122,8 @@ private:
     }
 
     Token parseIdentifier() {
+        Token token = Token(empty, empty);
+        return token;
     }
 };
 
