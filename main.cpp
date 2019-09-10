@@ -65,13 +65,35 @@ private:
 
     Token parseNumber() {
         Token token = Token(empty, empty);
+        // Check correctness
         int token_value = *src_iter - '0';    
         while (*src_iter >= '0' && *src_iter <= '9') {
             token_value = 10 * token_value + *src_iter++ - '0';
-            if (*src_iter == 'X') {
-                
+            if (*src_iter == 'H') {
+               token.class_name = "IntHex";
+               token.value = token_value + 'H';
+               return token;
+            }
+            if (*src_iter >= 'A' && *src_iter <= 'F') {
+                token.class_name = "IntHex";
+                token.value = token_value + *src_iter;
+                return token;
+            }
+            // Working with real numbers
+            if (*src_iter == '.') {
+                double real_token_val = 0;
+                double result_value  = token_value;
+                while(*src_iter != ' ') {
+                   real_token_val = *src_iter/10 + *src_iter++ - '0'; 
+                }
+                result_value = result_value + real_token_val; 
+                token.class_name = "Real";
+                token.value = result_value;
             }
         }
+        token.class_name = "IntDec";
+        token.value = token_value;
+        return token;
     }
 
     Token parseIdentifier() {
