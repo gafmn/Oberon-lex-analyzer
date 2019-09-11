@@ -92,10 +92,10 @@ public:
                 }
             }
             else if (isDigit(*src_iter)) {
-                token = parseNumber();
+                return parseNumber();
             }
             else if (isLetter(*src_iter)) {
-                token = parseIdentifier();
+                return parseIdentifier();
             }
 
             src_iter++;
@@ -107,6 +107,10 @@ public:
 private:
     bool isDigit(char c) {
         return c >= '0' && c <= '9';
+    }
+
+    bool isHexDigit(char c) {
+        return isDigit(c) || (c >= 'A' && c <= 'F');
     }
 
     bool isLetter(char c) {
@@ -132,46 +136,83 @@ private:
 
     Token parseNumber() {
         Token token;
-        // Check correctness
-        string token_value = "";    
-        token_value += *src_iter;
+        string value = "";    
 
-        while (*src_iter >= '0' && *src_iter <= '9') {
-            token_value += *src_iter;
-            src_iter++;
-            if (*src_iter == 'H') {
-               token.class_name = ClassName::IntHex;
-               token.value = token_value + 'H';
-               return token;
+        // Skip zeros
+        while (src_iter != src.end() && *src_iter == '0') { src_iter++; }
+
+        while (true) {
+            if (isDigit(*src_iter)) {
+                value += *src_iter;
             }
-            if (*src_iter >= 'A' && *src_iter <= 'F') {
+            else if (*src_iter >= 'A' && *src_iter <= 'F') {
+                while (src_iter != src.end() && isHexDigit(*src_iter)) {
+                    value += *src_iter;
+                    src_iter++;
+                }
+
+                if (src_iter == src.end() || *src_iter != 'H') {
+                    cerr << "Hex number should be ended with 'H' symbol" << endl;
+                    exit(1);
+                }
+
+                value += *src_iter;
+                src_iter++;
+
                 token.class_name = ClassName::IntHex;
-                token.value = token_value + *src_iter;
+                token.value = value;
                 return token;
             }
-            // Working with real numbers
-            if (*src_iter == '.') {
-                while (*src_iter != ' ') {
-                    token_value += *src_iter;
+            else if (*src_iter == 'H') {
+                value += *src_iter;
+                src_iter++;
+
+                token.class_name = ClassName::IntHex;
+                token.value = value;
+                return token;
+            }
+            else if (*src_iter == '.') {
+                value += *src_iter;
+                src_iter++;
+
+                while (src_iter != src.end() && isDigit(*src_iter)) {
+                    value += *src_iter;
                     src_iter++;
                 }
+
+                if (src_iter != src.end() && *src_iter == 'E') {
+                    value += *src_iter;
+                    src_iter++;
+
+                    if (src_iter != src.end() && (*src_iter == '+' || *src_iter == '-')) {
+                        value += *src_iter;
+                        src_iter++;
+                    }
+
+                    if (src_iter == src.end() || !isDigit(*src_iter)) {
+                        cerr << "An exponent notation should be ended with a number" << endl;
+                        exit(1);
+                    }
+
+                    while (src_iter != src.end() && isDigit(*src_iter)) {
+                        value += *src_iter;
+                        src_iter++;
+                    }
+                }
+
                 token.class_name = ClassName::Real;
-                token.value = token_value;
+                token.value = value;
                 return token;
             }
-            // Working with power of 10
-            if (*src_iter == 'E') {
-                while (*src_iter != ' ') {
-                    token_value += *src_iter;
-                    src_iter++;
-                }
-                token.class_name = ClassName::IntExp;
-                token.value = token_value;
-                return token;
+            else {
+                break;
             }
+
+            src_iter++;
         }
+
         token.class_name = ClassName::IntDec;
-        token.value = token_value;
+        token.value = value;
         return token;
     }
 
@@ -183,13 +224,13 @@ private:
 
 
 int main() {
-    string src = "";
+    string src = "123 1A123H (* 123 *) 0123.E+10";
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
 
     while (token.class_name != ClassName::Eof) {
-        cout << "Token " << token.value << endl;
+        cout << "Token " << token.class_name << " " << token.value << endl;
         token = lexer.next();
     }
 
