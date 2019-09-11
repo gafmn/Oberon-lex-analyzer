@@ -32,12 +32,13 @@ public:
 };
 
 class SymbolTable {
-    Node* head[MAX];
+public:
+    Node* nodes[MAX];
 
 public:
     SymbolTable() {
        for (int i = 0; i < MAX; i++) 
-            head[i] = NULL;
+            nodes[i] = NULL;
     }
 
     int hashf (string identifier) {
@@ -47,6 +48,48 @@ public:
             ascii_sum += identifier[i];
 
         return (ascii_sum % 100);
+    }
+
+    bool insert (string identifier) {
+        int hash_id = hashf(identifier);
+        Node* node = new Node(identifier);
+
+        if (nodes[hash_id] == NULL) {
+            nodes[hash_id] = node;
+
+            cout << "\n" << hash_id << " inserted";
+            
+            return true;
+        }else {
+            Node* start = nodes[hash_id];
+            while (start->next != NULL) 
+                start = start->next;
+            start->next = node;
+            cout << "\n" << hash_id << " inserted";
+            return true;
+        }
+        return false;
+    }
+
+    string find (string identifier) {
+        int hash_id = hashf(identifier);
+        Node* start = nodes[hash_id];
+
+        if (start == NULL) {
+            cout << "\n" << "Error";
+            return "-1";
+        }
+
+        while (start != NULL) {
+            if (start->identifier == identifier) {
+                cout << "\n";
+                cout << identifier << " was found" ;
+                return start->identifier;
+            }
+            start = start->next;
+        }
+        cout << identifier << " was not found";
+        return "-1";
     }
 
 };
@@ -228,11 +271,23 @@ int main() {
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
+    SymbolTable symbol_table = SymbolTable();
 
-    while (token.class_name != ClassName::Eof) {
-        cout << "Token " << token.class_name << " " << token.value << endl;
-        token = lexer.next();
+    int k = symbol_table.hashf("IF");
+    int m = symbol_table.hashf("BEGIN");
+    cout << k << " IF";
+    cout << m << " BEGIN";
+    if (symbol_table.insert("IF")) {
+        cout << "Everything is ok";
     }
+    symbol_table.insert("BEGIN");
+    string res = symbol_table.find("BEGIN");
+    cout << "\n" << res; 
+
+    // while (token.class_name != ClassName::Eof) {
+    //     cout << "Token " << token.class_name << " " << token.value << endl;
+    //     token = lexer.next();
+    //  }
 
     return 0;
 }
