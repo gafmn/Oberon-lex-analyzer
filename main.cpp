@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-
+#define MAX 100
 using namespace std;
 
 
@@ -15,6 +15,41 @@ enum ClassName {
     IntDec, IntHex, IntExp, Real,
 };
 
+class Node {
+public:
+    string identifier;
+    Node* next;
+
+public:
+    Node() {
+        next = NULL;
+    }
+
+    Node (string identifier) {
+        this->identifier = identifier;
+        this->next = NULL;
+    }
+};
+
+class SymbolTable {
+    Node* head[MAX];
+
+public:
+    SymbolTable() {
+       for (int i = 0; i < MAX; i++) 
+            head[i] = NULL;
+    }
+
+    int hashf (string identifier) {
+        int ascii_sum = 0;
+        
+        for (int i = 0; i < identifier.length(); i++) 
+            ascii_sum += identifier[i];
+
+        return (ascii_sum % 100);
+    }
+
+};
 
 class Token {
 public:
