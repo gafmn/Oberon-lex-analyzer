@@ -13,20 +13,22 @@ enum ClassName {
     Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
     While, For,
     IntDec, IntHex, IntExp, Real,
+    Identifier,
 };
 
 class Node {
 public:
-    string identifier;
-    Node* next;
+    string value;
+    ClassName class_name;
+    Node* next; 
 
-public:
     Node() {
-        next = NULL;
+        next = NULL;    
     }
 
-    Node (string identifier) {
-        this->identifier = identifier;
+    Node(string value, ClassName class_name) {
+        this->value = value;
+        this->class_name = class_name;
         this->next = NULL;
     }
 };
@@ -41,19 +43,18 @@ public:
             nodes[i] = NULL;
     }
 
-    int hashf (string identifier) {
+    int hashf (string node_value) {
         int ascii_sum = 0;
         
-        for (int i = 0; i < identifier.length(); i++) 
-            ascii_sum += identifier[i];
+        for (int i = 0; i < node_value.length(); i++) 
+            ascii_sum += node_value[i];
 
         return (ascii_sum % 100);
     }
 
-    bool insert (string identifier) {
-        int hash_id = hashf(identifier);
-        Node* node = new Node(identifier);
-
+    bool insert (string value, ClassName class_name) {
+        int hash_id = hashf(value);
+        Node* node = new Node(value, class_name);
         if (nodes[hash_id] == NULL) {
             nodes[hash_id] = node;
 
@@ -71,8 +72,8 @@ public:
         return false;
     }
 
-    string find (string identifier) {
-        int hash_id = hashf(identifier);
+    string find (string value) {
+        int hash_id = hashf(value);
         Node* start = nodes[hash_id];
 
         if (start == NULL) {
@@ -81,14 +82,14 @@ public:
         }
 
         while (start != NULL) {
-            if (start->identifier == identifier) {
+            if (start->value == value) {
                 cout << "\n";
-                cout << identifier << " was found" ;
-                return start->identifier;
+                cout << value << " was found" ;
+                return start->value;
             }
             start = start->next;
         }
-        cout << identifier << " was not found";
+        cout << value << " was not found";
         return "-1";
     }
 
@@ -145,6 +146,33 @@ public:
         }
 
         return token;
+    }
+
+    bool createSymbolTable() {
+        SymbolTable symbol_table = SymbolTable();
+        bool res = true;
+        // Feel the table keywords
+        string keywords[] = {
+            "ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO",
+            "ELSE", "ELSEIF", "END", "FALSE", "FOR", "IF", "IMPORT",
+            "IN", "IS", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER",
+            "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO",
+            "TRUE", "TYPE", "UNTIL", "VAR", "WHILE",
+        };
+
+        ClassName types[] = {
+            Arr, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, For, If, Import, 
+            In, Is, Mod, Modul, Nil, Of, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To,
+            True, Type, Until, Var, While,
+        };
+
+        int length = (sizeof(types)/sizeof(*types));
+
+        for (int i = 0; i < length - 1; i++) {
+            res = res && symbol_table.insert(keywords[i], types[i]);
+        }
+       
+        return res;
     }
 
 private:
@@ -261,6 +289,8 @@ private:
 
     Token parseIdentifier() {
         Token token;
+        string value = "";
+        
         return token;
     }
 };
@@ -271,23 +301,13 @@ int main() {
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
-    SymbolTable symbol_table = SymbolTable();
-
-    int k = symbol_table.hashf("IF");
-    int m = symbol_table.hashf("BEGIN");
-    cout << k << " IF";
-    cout << m << " BEGIN";
-    if (symbol_table.insert("IF")) {
-        cout << "Everything is ok";
+    
+    bool res = lexer.createSymbolTable();
+    cout << "\n" << res;
+    while (token.class_name != ClassName::Eof) {
+        cout << "Token " << token.class_name << " " << token.value << endl;
+        token = lexer.next();
     }
-    symbol_table.insert("BEGIN");
-    string res = symbol_table.find("BEGIN");
-    cout << "\n" << res; 
-
-    // while (token.class_name != ClassName::Eof) {
-    //     cout << "Token " << token.class_name << " " << token.value << endl;
-    //     token = lexer.next();
-    //  }
 
     return 0;
 }
