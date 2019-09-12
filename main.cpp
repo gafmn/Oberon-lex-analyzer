@@ -63,6 +63,8 @@ public:
             return true;
         }else {
             Node* start = nodes[hash_id];
+            if (start->value == value) 
+                return false;
             while (start->next != NULL) 
                 start = start->next;
             start->next = node;
@@ -77,7 +79,6 @@ public:
         Node* start = nodes[hash_id];
 
         if (start == NULL) {
-            cout << "\n" << "Error";
             return "-1";
         }
 
@@ -114,8 +115,12 @@ public:
 
 
 class Lexer {
+private:
     string src;
     string::iterator src_iter;
+
+public:
+    SymbolTable symbol_table;
 
 public:
     Lexer(string src) {
@@ -152,7 +157,7 @@ public:
     }
 
     bool createSymbolTable() {
-        SymbolTable symbol_table = SymbolTable();
+        symbol_table = SymbolTable();
         bool res = true;
         // Feel the table keywords
         string keywords[] = {
@@ -211,6 +216,9 @@ private:
 
         token.class_name = ClassName::Str;
         token.value = value;
+        if (symbol_table.find(value) != value)
+            if (symbol_table.insert(value, ClassName::Identifier))
+                    cout << "\n" << "New value is added: " << value << "\n";
         return token;
     }
 
@@ -337,16 +345,18 @@ private:
 
 int main() {
     string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123";
-
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
-    
-    bool res = lexer.createSymbolTable();
-    cout << "\n" << res;
+    lexer.createSymbolTable();
     while (token.class_name != ClassName::Eof) {
         cout << "Token " << token.class_name << " " << token.value << endl;
         token = lexer.next();
     }
 
+    string s = lexer.symbol_table.find("Hey there");
+    cout << "\n" << "FOUND" << ' '  << s;
+
+    bool res = lexer.symbol_table.insert("Hey there", ClassName::Identifier);
+    cout << "\n" << res;
     return 0;
 }
