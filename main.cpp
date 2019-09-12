@@ -12,7 +12,7 @@ enum ClassName {
     RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
     Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
     While, For,
-    IntDec, IntHex, IntExp, Real,
+    IntDec, IntHex, IntExp, Real, Str, StrHex,
 };
 
 
@@ -62,6 +62,9 @@ public:
             else if (isLetter(*src_iter)) {
                 return parseIdentifier();
             }
+            else if (*src_iter == '"') {
+                return parseString();
+            }
 
             src_iter++;
         }
@@ -80,6 +83,29 @@ private:
 
     bool isLetter(char c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    Token parseString() {
+        Token token;
+        string value = "";
+
+        src_iter++;
+
+        while (src_iter != src.end() && *src_iter != '"') {
+            value += *src_iter;
+            src_iter++;
+        }
+
+        if (src_iter == src.end()) {
+            cerr << "Strings should have quotes in the end" << endl;
+            exit(1);
+        }
+
+        src_iter++;
+
+        token.class_name = ClassName::Str;
+        token.value = value;
+        return token;
     }
 
     void parseComment() {
@@ -116,15 +142,20 @@ private:
                     src_iter++;
                 }
 
-                if (src_iter == src.end() || *src_iter != 'H') {
-                    cerr << "Hex number should be ended with 'H' symbol" << endl;
+                if (src_iter == src.end() || (*src_iter != 'H' && *src_iter != 'X')) {
+                    cerr << "Hex number should be ended with an 'H' or an 'X' symbol" << endl;
                     exit(1);
                 }
 
                 value += *src_iter;
                 src_iter++;
 
-                token.class_name = ClassName::IntHex;
+                if (value.back() == 'H') {
+                    token.class_name = ClassName::IntHex;
+                }
+                else if (value.back() == 'X') {
+                    token.class_name = ClassName::StrHex;
+                }
                 token.value = value;
                 return token;
             }
@@ -133,6 +164,14 @@ private:
                 src_iter++;
 
                 token.class_name = ClassName::IntHex;
+                token.value = value;
+                return token;
+            }
+            else if (*src_iter == 'X') {
+                value += *src_iter;
+                src_iter++;
+
+                token.class_name = ClassName::StrHex;
                 token.value = value;
                 return token;
             }
@@ -189,7 +228,7 @@ private:
 
 
 int main() {
-    string src = "123 1A123H (* 123 *) 0123.E+10";
+    string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123";
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
