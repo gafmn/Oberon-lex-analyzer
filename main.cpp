@@ -8,9 +8,9 @@ enum ClassName {
     Eof,  // Special type meaning the token is last in the source
     Add, Sub, Mul, Divide,
     Til, Apper, Dot, Comma, Semicolon, Pipe, LefBr, LefSqBr, LefFigBr,
-    Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, 
+    Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, Not,
     RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
-    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
+    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var, And, 
     While, For,
     IntDec, IntHex, IntExp, Real, Str, StrHex,
     Identifier,
@@ -150,7 +150,9 @@ public:
             else if (*src_iter == '"') {
                 return parseString();
             }
-
+            else if (isOtherSymbol(*src_iter)) {
+                return parseOtherSymbol();
+            }
             src_iter++;
         }
 
@@ -201,6 +203,11 @@ private:
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
     }
 
+    bool isOtherSymbol(char c) {
+        cout << "\n" << "THIS IS SYMBOL";
+        return (c >= '!' && c <= '/') || (c >= ':' && c <= '>');
+    }
+
     Token parseString() {
         Token token;
         string value = "";
@@ -239,6 +246,122 @@ private:
                 exit(1);
             }
         }
+    }
+
+    Token parseOtherSymbol() {
+        Token token;
+        
+        cout<< "\n" << *src_iter;
+        if (*src_iter == '+') {
+            token.value = "+";
+            token.class_name = ClassName::Add;
+            return token;
+        }
+        else if (*src_iter == '-') {
+            token.value = "-";
+            token.class_name = ClassName::Sub;
+            return token;
+        }
+        else if (*src_iter == '*') {
+            token.value = "*";
+            token.class_name = ClassName::Mul;
+            return token;
+        }
+        else if (*src_iter == '/') {
+            token.value = "/";
+            token.class_name = ClassName::Divide;
+            return token;
+        }
+        else if (*src_iter == '#') {
+            token.value = "#";
+            token.class_name = ClassName::NoEq;
+            return token;
+        }
+        else if (*src_iter == '=') {
+            token.value = '=';
+            token.class_name = ClassName::Eq;
+            return token;
+        }
+        else if (*src_iter == '<') {
+            if (*(src_iter + 1) == '=') {
+                src_iter++;
+                token.value = "<=";
+                token.class_name = ClassName::LesOrEq;
+                return token;
+            }
+            token.value = "<";
+            token.class_name = ClassName::Les;
+            return token;
+        }
+        else if (*src_iter == '>') {
+            if (*(src_iter + 1) == '=') {
+                src_iter++;
+                token.value = ">=";
+                token.class_name = ClassName::GreatOrEq;
+                return token;
+            }
+            token.value = ">";
+            token.class_name = ClassName::Great;
+            return token;
+        }
+        else if (*src_iter == '~') {
+            token.value = "~";
+            token.class_name = ClassName::Not;
+            return token;
+        }
+        else if (*src_iter == '[') {
+            token.value = "[";
+            token.class_name = ClassName::LefSqBr;
+            return token;
+        }
+        else if (*src_iter == '(') {
+            token.value = "(";
+            token.class_name = ClassName::LefBr;
+            return token;
+        }
+        else if (*src_iter == '{') {
+            token.value = "{";
+            token.class_name = ClassName::LefFigBr;
+            return token;
+        }
+        
+        else if (*src_iter == ']') {
+            token.value = "]";
+            token.class_name = ClassName::RightSqBr;
+            return token;
+        }
+        else if (*src_iter == ')') {
+            token.value = ")";
+            token.class_name = ClassName::RightBr;
+            return token;
+        }
+        else if (*src_iter == '}') {
+            token.value = "}";
+            token.class_name = ClassName::RightFigBr;
+            return token;
+        }
+        else if (*src_iter == '&') {
+            token.value = "&";
+            token.class_name = ClassName::And;
+            return token;
+        }
+        else if (*src_iter == ':') {
+            if (*(src_iter+1) == '=') {
+                src_iter++;
+                token.value = ":=";
+                token.class_name = ClassName::Assign;
+                return token;
+            }
+            token.value = ":";
+            token.class_name = ClassName::Colon;
+            return token;
+        }
+        else if (*src_iter == ';') {
+            token.value = ";";
+            token.class_name = ClassName::Semicolon;
+            return token;;
+        }
+        return token;
     }
 
     Token parseNumber() {
@@ -346,11 +469,12 @@ private:
 
 
 int main() {
-    string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123";
+    string src = "1+2";
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
     lexer.createSymbolTable();
     while (token.class_name != ClassName::Eof) {
+        cout << "\n";
         cout << "Token " << token.class_name << " " << token.value << endl;
         token = lexer.next();
     }
