@@ -125,6 +125,8 @@ public:
     Lexer(string src) {
         this->src = src;
         this->src_iter = this->src.begin();
+
+        createSymbolTable();
     }
 
     Token next() {
@@ -155,6 +157,9 @@ public:
         return token;
     }
 
+
+
+private:
     bool createSymbolTable() {
         symbol_table = SymbolTable();
         bool res = true;
@@ -186,7 +191,6 @@ public:
         return res;
     }
 
-private:
     bool isDigit(char c) {
         return c >= '0' && c <= '9';
     }
@@ -363,7 +367,7 @@ int main() {
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
-    lexer.createSymbolTable();
+
     while (token.class_name != ClassName::Eof) {
         cout << "Token " << token.class_name << " " << token.value << endl;
         token = lexer.next();
