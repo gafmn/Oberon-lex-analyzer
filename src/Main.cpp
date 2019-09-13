@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     Token token = lexer.next();
 
     while (token.class_name != ClassName::None) {
-        std::cout << "Token " << token.class_name << " " << token.value << std::endl;
+        std::cout << "Token\t" << token.class_name << "\t" << token.value << std::endl;
         token = lexer.next();
     }
 
