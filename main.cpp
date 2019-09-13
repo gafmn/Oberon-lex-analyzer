@@ -7,15 +7,21 @@ using namespace std;
 
 
 enum ClassName {
-    None, // Special class meaning that token is empty
-    Add, Sub, Mul, Divide,
-    Til, Apper, Dot, Comma, Semicolon, Pipe, LefBr, LefSqBr, LefFigBr,
-    Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, Not,
-    RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
-    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var, And,
-    While, For,
-    IntDec, IntHex, IntExp, Real, Str, StrHex,
-    Ident,
+    None,  // Special class meaning that token is empty
+    Ident,  // Identificator
+    Not, And, Or,  // Logical operators
+    Import, Module,  // Module keywords
+    True, False, Nil,  // Special values
+    Proc, Begin, End, Ret,  // Procedure keywords
+    Colon, Semicolon, Assign,  // Special symbols
+    If, Elif, Else, Case, Then,  // Condition keywords
+    Add, Sub, Mul, Div, DivInt, Mod,  // Math operations
+    While, For, To, By, Do, Rep, Until,  // Loop keywords
+    Type, Pointer, Var, Const, Arr, Of, Rec,  // Type keywords
+    IntDec, IntHex, IntExp, Real, Str, StrHex,  // Literals
+    Eq, NoEq, Less, LessOrEq, Great, GreatOrEq, Is, In,  // Comparison operators
+    LefBr, RightBr, LefSqBr, RightSqBr, LefFigBr, RightFigBr,  // Brackets
+    BoolType, CharType, IntType, RealType, ByteType, SetType,  // Basic types
 };
 
 class Node {
@@ -161,35 +167,41 @@ public:
 
 
 private:
-    bool createSymbolTable() {
-        symbol_table = SymbolTable();
-        bool res = true;
+    void createSymbolTable() {
         // Feel the table keywords
-        string keywords[] = {
-            "ARRAY", "BEGIN", "BY", "CASE", "CONST", "DIV", "DO",
-            "ELSE", "ELSEIF", "END", "FALSE", "FOR", "IF", "IMPORT",
-            "IN", "IS", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER",
-            "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO",
-            "TRUE", "TYPE", "UNTIL", "VAR", "WHILE",
+        pair<string, ClassName> keywords[] = {
+            {"ARRAY", ClassName::Arr}, {"OF", ClassName::Of},
+            {"PROCEDURE", ClassName::Proc}, {"BEGIN", ClassName::Begin},
+            {"END", ClassName::End}, {"RETURN", ClassName::Ret},
+            {"RECORD", ClassName::Rec},
+            {"POINTER", ClassName::Pointer}, {"TO", ClassName::To},
+            {"IN", ClassName::In}, {"IS", ClassName::Is}, {"OR", ClassName::Or},
+            {"DIV", ClassName::Div}, {"MOD", ClassName::Mod},
+            {"FALSE", ClassName::False}, {"TRUE", ClassName::True},
+            {"NIL", ClassName::Nil},
+            {"IF", ClassName::If}, {"THEN", ClassName::Then},
+            {"ELSIF", ClassName::Elif}, {"ELSE", ClassName::Else},
+            {"CASE", ClassName::Case}, {"OF", ClassName::Of},
+            {"WHILE", ClassName::While}, {"DO", ClassName::Do},
+            {"REPEAT", ClassName::Rep}, {"UNTIL", ClassName::Until},
+            {"FOR", ClassName::For}, {"BY", ClassName::By},
+            {"CONST", ClassName::Const}, {"TYPE", ClassName::Type},
+            {"VAR", ClassName::Var},
+            {"MODULE", ClassName::Module}, {"IMPORT", ClassName::Import},
+        };
+
+        string identifiers[] = {
             "ABS", "ASR", "ASSERT", "BOOLEAN", "BYTE", "CHAR", "CHR",
-            "DEC", "EXCL", "FLOOR", "FLT", "INC", "INTEGER", "LEN",
-            "LSL", "NEW", "ODD", "ORD", "PACK", "REAL", "ROR", "SET",
-            "UNPK", 
+            "DEC", "EXCL", "FLOOR", "FLT", "INC", "INCL", "INTEGER",
+            "LEN", "LSL", "NEW", "ODD", "ORD", "PACK", "REAL", "ROR",
+            "SET", "UNPK",
         };
 
-        ClassName types[] = {
-            Arr, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, For, If, Import, 
-            In, Is, Mod, Modul, Nil, Of, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To,
-            True, Type, Until, Var, While,
-        };
+        for (auto keyword : keywords)
+            symbol_table.insert(keyword.first, keyword.second);
 
-        int length = (sizeof(types)/sizeof(*types));
-
-        for (int i = 0; i < length - 1; i++) {
-            res = res && symbol_table.insert(keywords[i], types[i]);
-        }
-       
-        return res;
+        for (string identifier : identifiers)
+            symbol_table.insert(identifier, ClassName::Ident);
     }
 
     bool isDigit(char c) {
@@ -265,7 +277,7 @@ private:
         }
         else if (*src_iter == '/') {
             token.value = "/";
-            token.class_name = ClassName::Divide;
+            token.class_name = ClassName::Div;
         }
         else if (*src_iter == '#') {
             token.value = "#";
@@ -279,11 +291,11 @@ private:
             if (src_iter + 1 != src.end() && *(src_iter + 1) == '=') {
                 src_iter++;
                 token.value = "<=";
-                token.class_name = ClassName::LesOrEq;
+                token.class_name = ClassName::LessOrEq;
             }
             else {
                 token.value = "<";
-                token.class_name = ClassName::Les;
+                token.class_name = ClassName::Less;
             }
         }
         else if (*src_iter == '>') {
