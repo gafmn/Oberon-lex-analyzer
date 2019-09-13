@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
-#define MAX 100
+
 using namespace std;
+
+#define MAX_HASH 997
 
 
 enum ClassName {
@@ -13,7 +15,7 @@ enum ClassName {
     Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var, And, 
     While, For,
     IntDec, IntHex, IntExp, Real, Str, StrHex,
-    Identifier,
+    Ident,
     NONE, // Special type meaning the symbol table does not contain such identifier
 };
 
@@ -36,21 +38,23 @@ public:
 
 class SymbolTable {
 public:
-    Node* nodes[MAX];
+    Node* nodes[MAX_HASH];
 
 public:
     SymbolTable() {
-       for (int i = 0; i < MAX; i++) 
+       for (int i = 0; i < MAX_HASH; i++) 
             nodes[i] = NULL;
     }
 
     int hashf (string node_value) {
-        int ascii_sum = 0;
+        int hash_sum = 0;
        
-        for (char sym : node_value) 
-            ascii_sum += sym;
+        for (char sym : node_value) {
+            hash_sum += 29 * (sym + 281);
+            hash_sum %= MAX_HASH;
+        }
 
-        return (ascii_sum % 100);
+        return hash_sum;
     }
 
     bool insert (string value, ClassName class_name) {
@@ -58,8 +62,6 @@ public:
         Node* node = new Node(value, class_name);
         if (nodes[hash_id] == NULL) {
             nodes[hash_id] = node;
-
-            cout << "\n" << hash_id << " inserted";
             
             return true;
         }else {
@@ -69,7 +71,6 @@ public:
             while (start->next != NULL) 
                 start = start->next;
             start->next = node;
-            cout << "\n" << hash_id << " inserted";
             return true;
         }
         return false;
@@ -85,13 +86,10 @@ public:
 
         while (start != NULL) {
             if (start->value == value) {
-                cout << "\n";
-                cout << value << " was found" ;
                 return start->class_name;
             }
             start = start->next;
         }
-        cout << value << " was not found";
         return ClassName::NONE;
     }
 
@@ -127,6 +125,8 @@ public:
     Lexer(string src) {
         this->src = src;
         this->src_iter = this->src.begin();
+
+        createSymbolTable();
     }
 
     Token next() {
@@ -159,6 +159,9 @@ public:
         return token;
     }
 
+
+
+private:
     bool createSymbolTable() {
         symbol_table = SymbolTable();
         bool res = true;
@@ -190,7 +193,6 @@ public:
         return res;
     }
 
-private:
     bool isDigit(char c) {
         return c >= '0' && c <= '9';
     }
@@ -462,7 +464,22 @@ private:
     Token parseIdentifier() {
         Token token;
         string value = "";
-        
+
+        while (isLetter(*src_iter) || isDigit(*src_iter)) {
+            value += *src_iter;
+            src_iter++;
+        }
+
+        ClassName class_name = symbol_table.find(value);
+
+        if (class_name == ClassName::NONE) {
+            class_name = ClassName::Ident;
+            symbol_table.insert(value, class_name);
+        }
+
+        token.class_name = class_name;
+        token.value = value;
+
         return token;
     }
 };
@@ -470,9 +487,10 @@ private:
 
 int main() {
     string src = "1+2";
+
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
-    lexer.createSymbolTable();
+
     while (token.class_name != ClassName::Eof) {
         cout << "\n";
         cout << "Token " << token.class_name << " " << token.value << endl;
