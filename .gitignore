@@ -125,3 +125,7 @@ dmypy.json
 
 # VIM editor files
 *.sw[op]
+
+# Object files
+*.o
+*.out
