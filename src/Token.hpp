@@ -13,9 +13,9 @@ enum ClassName {
     If, Elif, Else, Case, Then,  // Condition keywords
     Add, Sub, Mul, Div, DivInt, Mod,  // Math operations
     While, For, To, By, Do, Rep, Until,  // Loop keywords
-    Colon, Semicolon, Assign, Comma, Dot,  // Special symbols
     Type, Pointer, Var, Const, Arr, Of, Rec,  // Type keywords
     IntDec, IntHex, IntExp, Real, Str, StrHex,  // Literals
+    Colon, Semicolon, Assign, Comma, Dot, Caret, Range,  // Special symbols
     Eq, NoEq, Less, LessOrEq, Great, GreatOrEq, Is, In,  // Comparison operators
     LefBr, RightBr, LefSqBr, RightSqBr, LefFigBr, RightFigBr,  // Brackets
     BoolType, CharType, IntType, RealType, ByteType, SetType,  // Basic types

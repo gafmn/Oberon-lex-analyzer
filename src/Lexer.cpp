@@ -32,6 +32,11 @@ Token Lexer::next() {
         else if (isOtherSymbol(*src_iter)) {
             return parseOtherSymbol();
         }
+        else {
+            std::cerr << "Invalid symbol: " << *src_iter << std::endl;
+            exit(1);
+        }
+
         src_iter++;
     }
 
@@ -92,7 +97,8 @@ bool Lexer::isLetter(char c) {
 
 
 bool Lexer::isOtherSymbol(char c) {
-    return (c >= '!' && c <= '/') || (c >= ':' && c <= '>') || (c >= '[' && c <= ']');
+    return (c >= '!' && c <= '/') || (c >= ':' && c <= '>') ||
+           (c >= '[' && c <= '^') || (c >= '{' && c <= '~');
 }
 
 
@@ -239,8 +245,19 @@ Token Lexer::parseOtherSymbol() {
         token.class_name = ClassName::Comma;
     }
     else if (*src_iter == '.') {
-        token.value = ".";
-        token.class_name = ClassName::Dot;
+        if (src_iter + 1 != src.end() && *(src_iter + 1) == '.') {
+            src_iter++;
+            token.value = "..";
+            token.class_name = ClassName::Range;
+        }
+        else {
+            token.value = ".";
+            token.class_name = ClassName::Dot;
+        }
+    }
+    else if (*src_iter == '^') {
+        token.value = "^";
+        token.class_name = ClassName::Caret;
     }
 
     src_iter++;
