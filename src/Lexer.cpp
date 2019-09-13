@@ -341,7 +341,12 @@ Token Lexer::parseIdentifier() {
     Token token;
     std::string value = "";
 
-    while (isLetter(*src_iter) || isDigit(*src_iter)) {
+    while (src_iter != src.end() && (isLetter(*src_iter) || isDigit(*src_iter))) {
+        value += *src_iter;
+        src_iter++;
+    }
+
+    if (src_iter != src.end() && *src_iter == '*') {
         value += *src_iter;
         src_iter++;
     }
