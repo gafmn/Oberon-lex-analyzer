@@ -166,6 +166,10 @@ public:
             "IN", "IS", "MOD", "MODULE", "NIL", "OF", "OR", "POINTER",
             "PROCEDURE", "RECORD", "REPEAT", "RETURN", "THEN", "TO",
             "TRUE", "TYPE", "UNTIL", "VAR", "WHILE",
+            "ABS", "ASR", "ASSERT", "BOOLEAN", "BYTE", "CHAR", "CHR",
+            "DEC", "EXCL", "FLOOR", "FLT", "INC", "INTEGER", "LEN",
+            "LSL", "NEW", "ODD", "ORD", "PACK", "REAL", "ROR", "SET",
+            "UNPK", 
         };
 
         ClassName types[] = {
@@ -216,9 +220,6 @@ private:
 
         token.class_name = ClassName::Str;
         token.value = value;
-        if (symbol_table.find(value) != value)
-            if (symbol_table.insert(value, ClassName::Identifier))
-                    cout << "\n" << "New value is added: " << value << "\n";
         return token;
     }
 
