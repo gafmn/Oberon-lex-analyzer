@@ -15,7 +15,7 @@ enum ClassName {
     Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var,
     While, For,
     IntDec, IntHex, IntExp, Real, Str, StrHex,
-    Identifier,
+    Ident,
     NONE, // Special type meaning the symbol table does not contain such identifier
 };
 
@@ -62,8 +62,6 @@ public:
         Node* node = new Node(value, class_name);
         if (nodes[hash_id] == NULL) {
             nodes[hash_id] = node;
-
-            cout << "\n" << hash_id << " inserted";
             
             return true;
         }else {
@@ -73,7 +71,6 @@ public:
             while (start->next != NULL) 
                 start = start->next;
             start->next = node;
-            cout << "\n" << hash_id << " inserted";
             return true;
         }
         return false;
@@ -89,13 +86,10 @@ public:
 
         while (start != NULL) {
             if (start->value == value) {
-                cout << "\n";
-                cout << value << " was found" ;
                 return start->class_name;
             }
             start = start->next;
         }
-        cout << value << " was not found";
         return ClassName::NONE;
     }
 
@@ -343,14 +337,30 @@ private:
     Token parseIdentifier() {
         Token token;
         string value = "";
-        
+
+        while (isLetter(*src_iter) || isDigit(*src_iter)) {
+            value += *src_iter;
+            src_iter++;
+        }
+
+        ClassName class_name = symbol_table.find(value);
+
+        if (class_name == ClassName::NONE) {
+            class_name = ClassName::Ident;
+            symbol_table.insert(value, class_name);
+        }
+
+        token.class_name = class_name;
+        token.value = value;
+
         return token;
     }
 };
 
 
 int main() {
-    string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123";
+    string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123 Abba LOLKEK123 A1B2 hello hello";
+
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
     lexer.createSymbolTable();
