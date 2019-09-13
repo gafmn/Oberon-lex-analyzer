@@ -16,10 +16,9 @@ Token Lexer::next() {
         if (*src_iter == ' ' || *src_iter == '\n' || *src_iter == '\t') {
             // Skip spaces and new line characters
         }
-        else if (*src_iter == '(') {
-            if (src_iter + 1 != src.end() && *(src_iter + 1) == '*') {
-                parseComment();
-            }
+        else if (*src_iter == '(' && (src_iter + 1) != src.end()
+                 && *(src_iter + 1) == '*') {
+            parseComment();
         }
         else if (isDigit(*src_iter)) {
             return parseNumber();
