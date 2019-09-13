@@ -235,6 +235,14 @@ Token Lexer::parseOtherSymbol() {
         token.value = ";";
         token.class_name = ClassName::Semicolon;
     }
+    else if (*src_iter == ',') {
+        token.value = ",";
+        token.class_name = ClassName::Comma;
+    }
+    else if (*src_iter == '.') {
+        token.value = ".";
+        token.class_name = ClassName::Dot;
+    }
 
     src_iter++;
     return token;

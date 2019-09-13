@@ -10,10 +10,10 @@ enum ClassName {
     Import, Module,  // Module keywords
     True, False, Nil,  // Special values
     Proc, Begin, End, Ret,  // Procedure keywords
-    Colon, Semicolon, Assign,  // Special symbols
     If, Elif, Else, Case, Then,  // Condition keywords
     Add, Sub, Mul, Div, DivInt, Mod,  // Math operations
     While, For, To, By, Do, Rep, Until,  // Loop keywords
+    Colon, Semicolon, Assign, Comma, Dot,  // Special symbols
     Type, Pointer, Var, Const, Arr, Of, Rec,  // Type keywords
     IntDec, IntHex, IntExp, Real, Str, StrHex,  // Literals
     Eq, NoEq, Less, LessOrEq, Great, GreatOrEq, Is, In,  // Comparison operators
