@@ -14,6 +14,7 @@ enum ClassName {
     While, For,
     IntDec, IntHex, IntExp, Real, Str, StrHex,
     Identifier,
+    NONE, // Special type meaning the symbol table does not contain such identifier
 };
 
 class Node {
@@ -74,24 +75,24 @@ public:
         return false;
     }
 
-    string find (string value) {
+    ClassName find (string value) {
         int hash_id = hashf(value);
         Node* start = nodes[hash_id];
 
         if (start == NULL) {
-            return "-1";
+            return ClassName::NONE;
         }
 
         while (start != NULL) {
             if (start->value == value) {
                 cout << "\n";
                 cout << value << " was found" ;
-                return start->value;
+                return start->class_name;
             }
             start = start->next;
         }
         cout << value << " was not found";
-        return "-1";
+        return ClassName::NONE;
     }
 
 };
