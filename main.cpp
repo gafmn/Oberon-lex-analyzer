@@ -1,7 +1,9 @@
 #include <iostream>
 #include <string>
-#define MAX 100
+
 using namespace std;
+
+#define MAX_HASH 997
 
 
 enum ClassName {
@@ -36,21 +38,23 @@ public:
 
 class SymbolTable {
 public:
-    Node* nodes[MAX];
+    Node* nodes[MAX_HASH];
 
 public:
     SymbolTable() {
-       for (int i = 0; i < MAX; i++) 
+       for (int i = 0; i < MAX_HASH; i++) 
             nodes[i] = NULL;
     }
 
     int hashf (string node_value) {
-        int ascii_sum = 0;
+        int hash_sum = 0;
        
-        for (char sym : node_value) 
-            ascii_sum += sym;
+        for (char sym : node_value) {
+            hash_sum += 29 * (sym + 281);
+            hash_sum %= MAX_HASH;
+        }
 
-        return (ascii_sum % 100);
+        return hash_sum;
     }
 
     bool insert (string value, ClassName class_name) {
