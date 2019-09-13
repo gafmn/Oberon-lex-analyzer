@@ -7,7 +7,7 @@ You need a C++ compiler compatible with C++11 standart
 ## Build
 
 ```
-g++ src/*.cpp -o prog.out
+g++ source/*.cpp -o prog.out
 ```
 
 The command above will create an executable with a name `prog.out`
