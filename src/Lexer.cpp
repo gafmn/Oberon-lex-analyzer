@@ -13,7 +13,7 @@ Token Lexer::next() {
     Token token;
 
     while (src_iter != src.end()) {
-        if (*src_iter == ' ' || *src_iter == '\n') {
+        if (*src_iter == ' ' || *src_iter == '\n' || *src_iter == '\t') {
             // Skip spaces and new line characters
         }
         else if (*src_iter == '(') {
