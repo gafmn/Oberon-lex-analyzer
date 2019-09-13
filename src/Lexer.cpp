@@ -338,6 +338,9 @@ Token Lexer::parseNumber() {
         src_iter++;
     }
 
+    if (value == "")
+        value = "0";
+
     token.class_name = ClassName::IntDec;
     token.value = value;
     return token;
