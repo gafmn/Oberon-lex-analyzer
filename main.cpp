@@ -250,39 +250,32 @@ private:
     Token parseOtherSymbol() {
         Token token = Token(ClassName::NONE, "");
         
-        cout<< "\n" << *src_iter;
         if (*src_iter == '+') {
             token.value = "+";
             token.class_name = ClassName::Add;
-            return token;
         }
         else if (*src_iter == '-') {
             token.value = "-";
             token.class_name = ClassName::Sub;
-            return token;
         }
         else if (*src_iter == '*') {
             token.value = "*";
             token.class_name = ClassName::Mul;
-            return token;
         }
         else if (*src_iter == '/') {
             token.value = "/";
             token.class_name = ClassName::Divide;
-            return token;
         }
         else if (*src_iter == '#') {
             token.value = "#";
             token.class_name = ClassName::NoEq;
-            return token;
         }
         else if (*src_iter == '=') {
             token.value = '=';
             token.class_name = ClassName::Eq;
-            return token;
         }
         else if (*src_iter == '<') {
-            if (*(src_iter + 1) == '=') {
+            if (src_iter + 1 != src.end() && *(src_iter + 1) == '=') {
                 src_iter++;
                 token.value = "<=";
                 token.class_name = ClassName::LesOrEq;
@@ -290,66 +283,53 @@ private:
             else {
                 token.value = "<";
                 token.class_name = ClassName::Les;
-     
             }
-            return token;
         }
         else if (*src_iter == '>') {
-            if (*(src_iter + 1) == '=') {
+            if (src_iter + 1 != src.end() && *(src_iter + 1) == '=') {
                 src_iter++;
                 token.value = ">=";
                 token.class_name = ClassName::GreatOrEq;
-            } 
+            }
             else {
                 token.value = ">";
                 token.class_name = ClassName::Great;
-
             }
-            return token;
         }
         else if (*src_iter == '~') {
             token.value = "~";
             token.class_name = ClassName::Not;
-            return token;
         }
         else if (*src_iter == '[') {
             token.value = "[";
             token.class_name = ClassName::LefSqBr;
-            return token;
         }
         else if (*src_iter == '(') {
             token.value = "(";
             token.class_name = ClassName::LefBr;
-            return token;
         }
         else if (*src_iter == '{') {
             token.value = "{";
             token.class_name = ClassName::LefFigBr;
-            return token;
         }
-        
         else if (*src_iter == ']') {
             token.value = "]";
             token.class_name = ClassName::RightSqBr;
-            return token;
         }
         else if (*src_iter == ')') {
             token.value = ")";
             token.class_name = ClassName::RightBr;
-            return token;
         }
         else if (*src_iter == '}') {
             token.value = "}";
             token.class_name = ClassName::RightFigBr;
-            return token;
         }
         else if (*src_iter == '&') {
             token.value = "&";
             token.class_name = ClassName::And;
-            return token;
         }
         else if (*src_iter == ':') {
-            if (*(src_iter+1) == '=') {
+            if (src_iter + 1 != src.end() && *(src_iter + 1) == '=') {
                 src_iter++;
                 token.value = ":=";
                 token.class_name = ClassName::Assign;
@@ -357,15 +337,14 @@ private:
             else {
                 token.value = ":";
                 token.class_name = ClassName::Colon;
-
             }
-            return token;
         }
         else if (*src_iter == ';') {
             token.value = ";";
             token.class_name = ClassName::Semicolon;
-            return token;;
         }
+
+        src_iter++;
         return token;
     }
 
