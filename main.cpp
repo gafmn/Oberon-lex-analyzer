@@ -204,8 +204,7 @@ private:
     }
 
     bool isOtherSymbol(char c) {
-        cout << "\n" << "THIS IS SYMBOL";
-        return (c >= '!' && c <= '/') || (c >= ':' && c <= '>');
+        return (c >= '!' && c <= '/') || (c >= ':' && c <= '>') || (c >= '[' && c <= ']');
     }
 
     Token parseString() {
@@ -249,7 +248,7 @@ private:
     }
 
     Token parseOtherSymbol() {
-        Token token;
+        Token token = Token(ClassName::NONE, "");
         
         cout<< "\n" << *src_iter;
         if (*src_iter == '+') {
@@ -287,10 +286,12 @@ private:
                 src_iter++;
                 token.value = "<=";
                 token.class_name = ClassName::LesOrEq;
-                return token;
             }
-            token.value = "<";
-            token.class_name = ClassName::Les;
+            else {
+                token.value = "<";
+                token.class_name = ClassName::Les;
+     
+            }
             return token;
         }
         else if (*src_iter == '>') {
@@ -298,10 +299,12 @@ private:
                 src_iter++;
                 token.value = ">=";
                 token.class_name = ClassName::GreatOrEq;
-                return token;
+            } 
+            else {
+                token.value = ">";
+                token.class_name = ClassName::Great;
+
             }
-            token.value = ">";
-            token.class_name = ClassName::Great;
             return token;
         }
         else if (*src_iter == '~') {
@@ -350,10 +353,12 @@ private:
                 src_iter++;
                 token.value = ":=";
                 token.class_name = ClassName::Assign;
-                return token;
             }
-            token.value = ":";
-            token.class_name = ClassName::Colon;
+            else {
+                token.value = ":";
+                token.class_name = ClassName::Colon;
+
+            }
             return token;
         }
         else if (*src_iter == ';') {
