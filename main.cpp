@@ -470,7 +470,7 @@ private:
 
 
 int main() {
-    string src = "1+2";
+    string src = "123 1A123H (* 123 *) 0123.E+10 0ABCD123X 228X \"Hey there\" 123 Abba LOLKEK123 A1B2 hello hello 1+2";
 
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
