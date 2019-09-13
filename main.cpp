@@ -46,9 +46,9 @@ public:
 
     int hashf (string node_value) {
         int ascii_sum = 0;
-        
-        for (int i = 0; i < node_value.length(); i++) 
-            ascii_sum += node_value[i];
+       
+        for (char sym : node_value) 
+            ascii_sum += sym;
 
         return (ascii_sum % 100);
     }
@@ -355,10 +355,5 @@ int main() {
         token = lexer.next();
     }
 
-    string s = lexer.symbol_table.find("Hey there");
-    cout << "\n" << "FOUND" << ' '  << s;
-
-    bool res = lexer.symbol_table.insert("Hey there", ClassName::Identifier);
-    cout << "\n" << res;
     return 0;
 }
