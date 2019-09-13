@@ -7,16 +7,15 @@ using namespace std;
 
 
 enum ClassName {
-    Eof,  // Special type meaning the token is last in the source
+    None, // Special class meaning that token is empty
     Add, Sub, Mul, Divide,
     Til, Apper, Dot, Comma, Semicolon, Pipe, LefBr, LefSqBr, LefFigBr,
     Assign, Pow, Eq, NoEq, Lat, Les, Great, LesOrEq, GreatOrEq, TwoDot, Colon, RightBr, RightSqBr, Not,
     RightFigBr, Arr, Import, Begin, By, Case, Const, Div, Do, Else, Elif, End, False, If, In,
-    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var, And, 
+    Is, Mod, Modul, Nil, Of, Or, Pointer, Proc, Rec, Rep, Return, Then, To, True, Type, Until, Var, And,
     While, For,
     IntDec, IntHex, IntExp, Real, Str, StrHex,
     Ident,
-    NONE, // Special type meaning the symbol table does not contain such identifier
 };
 
 class Node {
@@ -81,7 +80,7 @@ public:
         Node* start = nodes[hash_id];
 
         if (start == NULL) {
-            return ClassName::NONE;
+            return ClassName::None;
         }
 
         while (start != NULL) {
@@ -90,7 +89,7 @@ public:
             }
             start = start->next;
         }
-        return ClassName::NONE;
+        return ClassName::None;
     }
 
 };
@@ -102,7 +101,7 @@ public:
 
 public:
     Token() {
-        this->class_name = ClassName::Eof;
+        this->class_name = ClassName::None;
     }
 
     Token(ClassName class_name, string value) {
@@ -250,7 +249,7 @@ private:
     }
 
     Token parseOtherSymbol() {
-        Token token = Token(ClassName::NONE, "");
+        Token token = Token(ClassName::None, "");
         
         if (*src_iter == '+') {
             token.value = "+";
@@ -456,7 +455,7 @@ private:
 
         ClassName class_name = symbol_table.find(value);
 
-        if (class_name == ClassName::NONE) {
+        if (class_name == ClassName::None) {
             class_name = ClassName::Ident;
             symbol_table.insert(value, class_name);
         }
@@ -475,7 +474,7 @@ int main() {
     Lexer lexer = Lexer(src);
     Token token = lexer.next();
 
-    while (token.class_name != ClassName::Eof) {
+    while (token.class_name != ClassName::None) {
         cout << "\n";
         cout << "Token " << token.class_name << " " << token.value << endl;
         token = lexer.next();
